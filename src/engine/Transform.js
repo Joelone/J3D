@@ -54,19 +54,19 @@ J3D.Transform = function(n, u) {
     /**
      * Local transformation matrix. Do not manipulate directly, it will be overwritten by the rendering function.
      */
-    this.matrix = mat4.create();
+    this.matrix = new SQR.Matrix44();
 
     /**
      * World transformation matrix (concatenated local transforms of all parents and self).
      * Do not manipulate directly, it will be overwritten by the rendering function.
      */
-    this.globalMatrix = mat4.create();
+    this.globalMatrix = new SQR.Matrix44();
 
     /**
      * Normal matrix (inverse/transpose of global matrix for use with normals).
      * Do not manipulate directly, it will be overwritten by the rendering function.
      */
-    this.normalMatrix = mat3.create();
+    this.normalMatrix = new SQR.Matrix33();
 
     this.isStatic = false;
     this._lockedMatrix = false;
@@ -275,22 +275,24 @@ J3D.Transform.prototype.updateWorld = function(parent) {
     if (this._lockedMatrix) return;
 
     if (!this.matrixMode) {
-        mat4.identity(this.matrix);
+        var p = this.position;
 
-        mat4.translate(this.matrix, [this.position.x, this.position.y, this.position.z]);
+        var r = this.rotation;
+        var s = this.scale;
 
-        mat4.rotateZ(this.matrix, this.rotation.z);
-        mat4.rotateX(this.matrix, this.rotation.x);
-        mat4.rotateY(this.matrix, this.rotation.y);
-
-        mat4.scale(this.matrix, [this.scale.x, this.scale.y, this.scale.z]);
+        this.matrix.setTRS(p.x, p.y, p.z, r.x, r.y, r.z, s.x, s.y, s.z);
     }
 
-    if (parent != null) mat4.multiply(parent.globalMatrix, this.matrix, this.globalMatrix);
-    else this.globalMatrix = this.matrix;
+    if (this.parent) {
+        this.parent.globalMatrix.copyTo(this.globalMatrix);
+        this.globalMatrix.multiply(this.matrix);
+    } else {
+        this.matrix.copyTo(this.globalMatrix);
+    }
 
-    mat4.toInverseMat3(this.globalMatrix, this.normalMatrix);
-    mat3.transpose(this.normalMatrix);
+    this.globalMatrix.copyRotationTo(this.normalMatrix);
+    this.normalMatrix.inverse();
+    this.normalMatrix.transpose();
 
     if (this.isStatic) this._lockedMatrix = true;
 }
@@ -299,11 +301,8 @@ J3D.Transform.prototype.updateWorld = function(parent) {
  * Updates the world position of the transform. Can be called if world position is necessary for any reason, otherwise, the engine is calling this function only if the transform has a light.
  */
 J3D.Transform.prototype.updateWorldPosition = function() {
-    var tmp = [0,0,0];
-    mat4.multiplyVec3(this.globalMatrix, tmp);
-    this.worldPosition.x = tmp[0];
-    this.worldPosition.y = tmp[1];
-    this.worldPosition.z = tmp[2];
+    this.globalMatrix.extractPosition(this.worldPosition);
+    return this.worldPosition;
 }
 
 J3D.Transform.prototype.getTileOffset = function() {
@@ -342,8 +341,8 @@ J3D.Transform.prototype.find = function(path) {
  * After this method is invoked, the inverseMat property becomes available on this object.
  */
 J3D.Transform.prototype.updateInverseMat = function() {
-    if (!this.inverseMat) this.inverseMat = mat4.create();
-    mat4.inverse(this.globalMatrix, this.inverseMat);
+    if (!this.inverseMat) this.inverseMat = new SQR.Matrix44();
+    this.globalMatrix.inverse(this.inverseMat);
     this.updateWorldPosition();
 }
 

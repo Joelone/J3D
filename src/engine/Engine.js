@@ -210,16 +210,16 @@ J3D.Engine.prototype.renderObject = function(t) {
 
     // Setup standard uniforms and attributes
     if (s.uniforms.pMatrix)
-        gl.uniformMatrix4fv(s.uniforms.pMatrix.location, false, c.camera.projectionMat.toArray());
+        gl.uniformMatrix4fv(s.uniforms.pMatrix.location, false, c.camera.projectionMat.data);
 
     if (s.uniforms.vMatrix)
-        gl.uniformMatrix4fv(s.uniforms.vMatrix.location, false, c.inverseMat);
+        gl.uniformMatrix4fv(s.uniforms.vMatrix.location, false, c.inverseMat.data);
 
     if (s.uniforms.mMatrix)
-        gl.uniformMatrix4fv(s.uniforms.mMatrix.location, false, t.globalMatrix);
+        gl.uniformMatrix4fv(s.uniforms.mMatrix.location, false, t.globalMatrix.data);
 
     if (s.uniforms.nMatrix)
-        gl.uniformMatrix3fv(s.uniforms.nMatrix.location, false, t.normalMatrix);
+        gl.uniformMatrix3fv(s.uniforms.nMatrix.location, false, t.normalMatrix.data);
 
     if (s.uniforms.uEyePosition)
         gl.uniform3fv(s.uniforms.uEyePosition.location, c.worldPosition.xyz());

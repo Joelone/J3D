@@ -20,9 +20,11 @@ J3D.ParticleUtil.onSphere = function(amount, radius, thickness, origin) {
 	
 	origin = origin || v3.ZERO();	
 	thickness = (thickness == null) ? 1 : thickness;
+
+    var v = new v3();
 	
 	for (var i = 0; i < amount * 3; i += 3) {
-		var v = v3.random().norm().mul(radius + Math.random() * thickness);
+		v.random().norm().mul(radius + Math.random() * thickness);
 		vertices[i] = v.x;
 		vertices[i + 1] = v.y;
 		vertices[i + 2] = v.z;

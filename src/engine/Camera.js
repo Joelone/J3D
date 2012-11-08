@@ -38,13 +38,14 @@ J3D.Camera = function(params) {
     this.fov = params.fov;
 
     this.onResize = function() {
-        this.projectionMat = new m44();
+        this.projectionMat = new SQR.ProjectionMatrix();
         
         if (params.type == J3D.PERSPECTIVE) {
             this.aspect = gl.viewportWidth / gl.viewportHeight;
             this.projectionMat.perspective(params.fov, this.aspect, params.near, params.far);
         } else {
-            this.projectionMat.ortho(params.left, params.right, params.top, params.bottom, params.near, params.far);
+            throw "Orthographic projection is not currently supported";
+            //this.projectionMat.ortho(params.left, params.right, params.top, params.bottom, params.near, params.far);
         }
     }
 

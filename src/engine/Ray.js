@@ -15,8 +15,8 @@ J3D.Ray = function(o, d) {
 	this.localDirection = new v3();
 }
 
-J3D.Ray._mt = mat4.create();
-J3D.Ray._nt = mat3.create();
+J3D.Ray._mt = new Float32Array(16);
+J3D.Ray._nt = new Float32Array(16);
 
 J3D.Ray.fromMousePosition = function(mouseX, mouseY, camera, canvasRect) {
 

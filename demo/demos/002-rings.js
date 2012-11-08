@@ -44,7 +44,7 @@ registerDemo(function(engine) {
 
         var r = J3D.Ray.fromMousePosition(interactor.pageX, interactor.pageY, camera);
 
-        for (var i = 0; i < 7; i++) {
+        for (var i = 0; i < 1; i++) {
             var h = J3D.Intersection.rayTest(r, rings[i]);
             rings[i].renderer = (h) ? whiteMat : rings[i].originalRenderer;
             rings[i].rotation.y = sx + (sx * i * 0.02);

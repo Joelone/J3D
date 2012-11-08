@@ -3,7 +3,7 @@
  */
 SQR.Matrix2D = function() {
 
-    if(typeof Float32Array !== 'undefined') Float32Array = Array;
+    if(typeof Float32Array == 'undefined') Float32Array = Array;
     this.data = new Float32Array(9);
 
     var a, b, d, x, y;

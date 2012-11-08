@@ -103,6 +103,10 @@ SQR.V3.dot = function(a, b) {
     return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
+SQR.V3.prototype.toUniform = function() {
+    return [this.x, this.y, this.z];
+}
+
 SQR.V3.prototype.cross = function(a, b) {
     var x = a.y * b.z - a.z * b.y;
     var y = a.z * b.x - a.x * b.z;

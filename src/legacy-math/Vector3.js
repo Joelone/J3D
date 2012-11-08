@@ -34,25 +34,18 @@ v3.prototype.fromArray = function(a){
 /**
  * Magnitude (aka length of the vector) squared
  */
-v3.prototype.magSq = function() {
-    return this.x * this.x + this.y * this.y + this.z * this.z;
-};
+v3.prototype.magSq = function() { return this.x * this.x + this.y * this.y + this.z * this.z; };
 
 /**
  * Magnitude (aka length of the vector)
  */
-v3.prototype.mag = function() {
-    return Math.sqrt( this.magSq() );
-};
+v3.prototype.mag = function() { return Math.sqrt( this.magSq() ); };
 
 /**
  * Multiply vector by scalar
  */
 v3.prototype.mul = function(s) {
-	this.x *= s;
-    this.y *= s;
-    this.z *= s;
-    return this;
+	return new v3(this.x * s, this.y * s, this.z * s);
 }
 
 /**
@@ -77,8 +70,10 @@ v3.prototype.norm = function() {
 /**
  * Returns a copy of this vector
  */
-v3.prototype.cp = function() {
-	return new v3(this.x, this.y, this.z);
+v3.prototype.cp = function(v) {
+    v = v || new v3();
+	v.set(this.x, this.y, this.z);
+    return v;
 }
 
 /**
@@ -189,7 +184,4 @@ v3.FORWARD = function() { return new v3(0, 0, -1); }
 /**
  * Returns a random vector. All components are in range -1 to 1. It is NOT normalized.
  */
-v3.prototype.random = function(v) {
-    this.set(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
-    return this;
-}
+v3.random = function() { return new v3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1); }

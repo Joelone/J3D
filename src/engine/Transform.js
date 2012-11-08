@@ -112,6 +112,34 @@ J3D.Transform = function(n, u) {
     this.textureTile = v2.ONE();
     this.textureOffset = v2.ZERO();
 
+    var directionVec = new SQR.V3();
+
+    /**
+     * @returns Multiplies a vector by the normal matrix of this transform
+     */
+    this.transformDirection = function(d) {
+        this.normalMatrix.transformVector(d);
+        return d;
+    }
+
+    /**
+     * @returns Transforms world forward pointing vector
+     */
+    this.forward = function() {
+        directionVec.set(0, 0, -1);
+        this.normalMatrix.transformVector(directionVec);
+        return directionVec;
+    }
+
+    /**
+     * @returns Transforms world left pointing vector
+     */
+    this.left = function() {
+        directionVec.set(-1, 0, 0);
+        this.normalMatrix.transformVector(directionVec);
+        return directionVec;
+    }
+
     /**
      * Add a child transform to this transform.
      *
@@ -236,37 +264,6 @@ J3D.Transform.prototype.clone = function() {
 }
 
 /**
- * @returns Multiplies a vector by the normal matrix of this transform
- */
-J3D.Transform.prototype.transformDirection = function(d) {
-    // TODO: optimize
-    var tm = mat4.create();
-    var tv = vec3.create();
-    tv = mat4.multiplyVec3(mat3.toMat4(this.normalMatrix, tm), d.xyz(), tv);
-    return new v3(tv[0], tv[1], tv[2]).norm();
-}
-
-/**
- * @returns Transforms world forward pointing vector
- */
-J3D.Transform.prototype.forward = function() {
-    // TODO: optimize
-    var tm = mat4.create();
-    var tv = mat4.multiplyVec3(mat3.toMat4(this.normalMatrix, tm), [0,0,-1]);
-    return new v3(tv[0], tv[1], tv[2]).norm();
-}
-
-/**
- * @returns Transforms world left pointing vector
- */
-J3D.Transform.prototype.left = function() {
-    // TODO: optimize
-    var tm = mat4.create();
-    var tv = mat4.multiplyVec3(mat3.toMat4(this.normalMatrix, tm), [-1,0,0]);
-    return new v3(tv[0], tv[1], tv[2]).norm();
-}
-
-/**
  * Updates the world matrix of this transform by concatenating the transforms world matrix with its parents. Called internally by the engine during rendering.
  *
  * @param parent The parent transform
@@ -290,19 +287,13 @@ J3D.Transform.prototype.updateWorld = function(parent) {
         this.matrix.copyTo(this.globalMatrix);
     }
 
+    this.globalMatrix.extractPosition(this.worldPosition);
+
     this.globalMatrix.copyRotationTo(this.normalMatrix);
     this.normalMatrix.inverse();
     this.normalMatrix.transpose();
 
     if (this.isStatic) this._lockedMatrix = true;
-}
-
-/**
- * Updates the world position of the transform. Can be called if world position is necessary for any reason, otherwise, the engine is calling this function only if the transform has a light.
- */
-J3D.Transform.prototype.updateWorldPosition = function() {
-    this.globalMatrix.extractPosition(this.worldPosition);
-    return this.worldPosition;
 }
 
 J3D.Transform.prototype.getTileOffset = function() {
@@ -342,7 +333,9 @@ J3D.Transform.prototype.find = function(path) {
  */
 J3D.Transform.prototype.updateInverseMat = function() {
     if (!this.inverseMat) this.inverseMat = new SQR.Matrix44();
-    this.globalMatrix.inverse(this.inverseMat);
-    this.updateWorldPosition();
+    this.globalMatrix.copyTo(this.inverseMat);
+    this.inverseMat.transpose();
+    this.inverseMat.inverse();
+    return this.inverseMat;
 }
 

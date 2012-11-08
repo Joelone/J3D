@@ -49,8 +49,8 @@ registerDemo(function(engine) {
 
     this.render = function(interactor) {
 
-        root.rotation.x += interactor.centerX * J3D.Time.deltaTime / 1000;
-        root.rotation.y += interactor.centerY * J3D.Time.deltaTime / 2000;
+        root.rotation.x += interactor.centerY * J3D.Time.deltaTime / 1000;
+        //root.rotation.y += interactor.centerX * J3D.Time.deltaTime / 2000;
 
         engine.render();
     }

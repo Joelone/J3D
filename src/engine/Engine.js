@@ -209,27 +209,38 @@ J3D.Engine.prototype.renderObject = function(t) {
     // this.lastProgram = s;
 
     // Setup standard uniforms and attributes
-    if (s.uniforms.pMatrix)
+    if (s.uniforms.pMatrix) {
         gl.uniformMatrix4fv(s.uniforms.pMatrix.location, false, c.camera.projectionMat.data);
+        //console.log("Proj", c.camera.projectionMat.data);
+    }
 
-    if (s.uniforms.vMatrix)
+    if (s.uniforms.vMatrix) {
         gl.uniformMatrix4fv(s.uniforms.vMatrix.location, false, c.inverseMat.data);
+        //console.log("Invt", c.inverseMat.data);
+    }
 
-    if (s.uniforms.mMatrix)
+    if (s.uniforms.mMatrix) {
         gl.uniformMatrix4fv(s.uniforms.mMatrix.location, false, t.globalMatrix.data);
+        //console.log("Glob", c.globalMatrix.data);
+    }
 
-    if (s.uniforms.nMatrix)
+    if (s.uniforms.nMatrix) {
         gl.uniformMatrix3fv(s.uniforms.nMatrix.location, false, t.normalMatrix.data);
+        //console.log("Norm", c.normalMatrix.data);
+    }
 
-    if (s.uniforms.uEyePosition)
+    if (s.uniforms.uEyePosition) {
         gl.uniform3fv(s.uniforms.uEyePosition.location, c.worldPosition.xyz());
+        //console.log("GPos", c.worldPosition.xyz());
+    }
 
-    if (s.uniforms.uTileOffset)
+    if (s.uniforms.uTileOffset) {
         gl.uniform4fv(s.uniforms.uTileOffset.location, t.getTileOffset());
+    }
 
-
-    if (this._lights.length > 0)
+    if (this._lights.length > 0) {
         J3D.ShaderUtil.setLights(s, this._lights);
+    }
 
     J3D.ShaderUtil.setAttributes(s, t.geometry);
 

@@ -1,6 +1,5 @@
 SQR.Matrix33 = function() {
 
-    if (typeof Float32Array !== 'undefined') Float32Array = Array;
     this.data = new Float32Array(9);
 
     this.identity = function() {
@@ -11,41 +10,57 @@ SQR.Matrix33 = function() {
         return this;
     }
 
+    this.transformVector = function (v, pv) {
+        var d = this.data;
+        var x = v.x, y = v.y, z = v.z, w = v.w;
+        pv = pv || v;
+
+        pv.x = d[0] * x + d[3] * y + d[6] * z;
+        pv.y = d[1] * x + d[4] * y + d[7] * z;
+        pv.z = d[2] * x + d[5] * y + d[8] * z;
+
+        return pv;
+    }
+
     this.determinant = function() {
         var d = this.data;
 
         return d[0] * (d[4] * d[8] - d[7] * d[5]) +
-               d[4] * (d[7] * d[2] - d[1] * d[8]) +
+               d[3] * (d[7] * d[2] - d[1] * d[8]) +
                d[6] * (d[1] * d[5] - d[4] * d[2]);
     }
 
     this.inverse = function(m) {
         var d = this.data;
-        var a = (m) ? m.data || m : this.data;
-        var det = this.determinant();
+        m = m || this.data;
 
-        var d0 = d[0], d3 = d[3], d6 = d[6],
-            d1 = d[1], d4 = d[4], d7 = d[7],
-            d2 = d[2], d5 = d[5], d8 = d[8];
+        var a00 = d[0], a01 = d[1], a02 = d[2],
+            a10 = d[3], a11 = d[4], a12 = d[5],
+            a20 = d[6], a21 = d[7], a22 = d[8],
 
-        if (Math.abs(det) < 0.0001) {
-            console.warn("Attempt to inverse a singular matrix. ", this.data);
+            b01 = a22 * a11 - a12 * a21,
+            b11 = -a22 * a10 + a12 * a20,
+            b21 = a21 * a10 - a11 * a20,
+
+            d = a00 * b01 + a01 * b11 + a02 * b21,
+            id;
+
+        if (!d) {
+            console.warn("Attempt to inverse a singular matrix44. ", this.data);
             return m;
         }
+        
+        id = 1 / d;
 
-        det = 1 / det;
-
-        a[0] = (d4 * d8 - d7 * d5) * det;
-        a[3] = (d6 * d5 - d3 * d8) * det;
-        a[6] = (d3 * d7 - d6 * d4) * det;
-
-        a[1] = (d7 * d2 - d1 * d8) * det;
-        a[4] = (d0 * d8 - d6 * d2) * det;
-        a[7] = (d6 * d1 - d0 * d7) * det;
-
-        a[2] = (d1 * d5 - d4 * d2) * det;
-        a[5] = (d3 * d2 - d0 * d5) * det;
-        a[8] = (d0 * d4 - d3 * d1) * det;
+        m[0] = b01 * id;
+        m[1] = (-a22 * a01 + a02 * a21) * id;
+        m[2] = (a12 * a01 - a02 * a11) * id;
+        m[3] = b11 * id;
+        m[4] = (a22 * a00 - a02 * a20) * id;
+        m[5] = (-a12 * a00 + a02 * a10) * id;
+        m[6] = b21 * id;
+        m[7] = (-a21 * a00 + a01 * a20) * id;
+        m[8] = (a11 * a00 - a01 * a10) * id;
 
         return m;
 
@@ -59,7 +74,7 @@ SQR.Matrix33 = function() {
             d2 = d[2], d5 = d[5], d8 = d[8];
 
         d[0] = d0;
-        d[1] = d4;
+        d[1] = d3;
         d[2] = d6;
 
         d[3] = d1;
